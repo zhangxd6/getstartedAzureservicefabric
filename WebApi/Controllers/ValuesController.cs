@@ -10,6 +10,8 @@ using System.Linq;
 using Microsoft.ServiceFabric.Services.Remoting.Client;
 using Microsoft.ServiceFabric.Services.Remoting.Wcf.Client;
 using Common;
+using Microsoft.ServiceFabric.Actors.Client;
+using Microsoft.ServiceFabric.Actors;
 
 namespace WebApi.Controllers
 {
@@ -25,7 +27,7 @@ namespace WebApi.Controllers
       return new string[] { "value1", "value2", Environment.MachineName };
     }
 
-    
+
     [HttpGet]
     [Route("guest")]
     public async Task<IHttpActionResult> GetAsciiArt(string text)
@@ -118,5 +120,59 @@ namespace WebApi.Controllers
       return BadRequest();
 
     }
+
+
+    [HttpPost]
+    [Route("pi")]
+    public async Task<IHttpActionResult> CalculatePi(long number)
+    {
+      try
+      {
+        var fc = new FabricClient();
+        var serviceUri = new Uri(FabricRuntime.GetActivationContext().ApplicationName + "/AggreatorActorService");
+        Guid id = Guid.NewGuid();
+        ActorId aid = new ActorId(id);
+        var aproxy = ActorProxy.Create<IAggreator>(aid, serviceUri);
+        await aproxy.Init(number);
+        var pUri = new Uri(FabricRuntime.GetActivationContext().ApplicationName + "/ParticleActorService");
+        var rnd = new Random();
+         for (long i = 0; i < number; i++)
+        //Parallel.For(0, number, async (i) =>
+           {
+             ActorId pid = new ActorId(Guid.NewGuid());
+             var pproxy = ActorProxy.Create<IParticle>(pid, pUri);
+             var x = rnd.NextDouble() - 0.5;
+             var y = rnd.NextDouble() - 0.5;
+             await pproxy.DestermineLocation(x, y, id);
+             await Task.Delay(new TimeSpan(0, 0,0,0,300));
+           }
+        return Ok(id);
+      }
+      catch
+      {
+        return BadRequest();
+      }
+    }
+
+
+    [HttpGet]
+    [Route("pi")]
+    public async Task<IHttpActionResult> GetPi(Guid id)
+    {
+      try
+      {
+        var fc = new FabricClient();
+        var serviceUri = new Uri(FabricRuntime.GetActivationContext().ApplicationName + "/AggreatorActorService");
+        ActorId aid = new ActorId(id);
+        var aproxy = ActorProxy.Create<IAggreator>(aid, serviceUri);
+        var result = await aproxy.GetResult();
+        return Ok(result);
+      }
+      catch
+      {
+        return BadRequest();
+      }
+    }
+
   }
 }

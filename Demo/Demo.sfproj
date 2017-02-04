@@ -34,6 +34,8 @@
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Aggreator\Aggreator.csproj" />
+    <ProjectReference Include="..\Particle\Particle.csproj" />
     <ProjectReference Include="..\Stateful1\Stateful1.csproj" />
     <ProjectReference Include="..\WebApi\WebApi.csproj" />
   </ItemGroup>

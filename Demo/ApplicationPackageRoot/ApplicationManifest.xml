@@ -6,10 +6,22 @@
     <Parameter Name="Stateful1_TargetReplicaSetSize" DefaultValue="3" />
     <Parameter Name="Guest2_InstanceCount" DefaultValue="-1" />
     <Parameter Name="WebApi_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="AggreatorActorService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="AggreatorActorService_MinReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="AggreatorActorService_TargetReplicaSetSize" DefaultValue="3" />
+    <Parameter Name="ParticleActorService_PartitionCount" DefaultValue="10" />
+    <Parameter Name="ParticleActorService_MinReplicaSetSize" DefaultValue="1" />
+    <Parameter Name="ParticleActorService_TargetReplicaSetSize" DefaultValue="1" />
   </Parameters>
   <!-- Import the ServiceManifest from the ServicePackage. The ServiceManifestName and ServiceManifestVersion 
        should match the Name and Version attributes of the ServiceManifest element defined in the 
        ServiceManifest.xml file. -->
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="AggreatorPkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="ParticlePkg" ServiceManifestVersion="1.0.0" />
+  </ServiceManifestImport>
   <ServiceManifestImport>
     <ServiceManifestRef ServiceManifestName="Stateful1Pkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
@@ -42,6 +54,16 @@
       <StatelessService ServiceTypeName="WebApiType" InstanceCount="[WebApi_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
+    </Service>
+    <Service Name="AggreatorActorService" GeneratedIdRef="3aa10ba5-1c4b-477d-87bd-c3dd29b88e7e|Persisted">
+      <StatefulService ServiceTypeName="AggreatorActorServiceType" TargetReplicaSetSize="[AggreatorActorService_TargetReplicaSetSize]" MinReplicaSetSize="[AggreatorActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[AggreatorActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
+    </Service>
+    <Service Name="ParticleActorService" GeneratedIdRef="b44d4b77-45d6-451c-9221-dbfedae23a7f|None">
+      <StatefulService ServiceTypeName="ParticleActorServiceType" TargetReplicaSetSize="[ParticleActorService_TargetReplicaSetSize]" MinReplicaSetSize="[ParticleActorService_MinReplicaSetSize]">
+        <UniformInt64Partition PartitionCount="[ParticleActorService_PartitionCount]" LowKey="-9223372036854775808" HighKey="9223372036854775807" />
+      </StatefulService>
     </Service>
   </DefaultServices>
   <Principals>
