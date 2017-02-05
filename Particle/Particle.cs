@@ -32,11 +32,11 @@ namespace Particle
     {
     }
 
-    public Task DestermineLocation(double x, double y, Guid aggreator)
+    public Task DestermineLocation(double x, double y, Guid aggreator, long index)
     {
       bool inside = (x * x + y * y) <= 0.25;
 
-
+      System.Diagnostics.Debug.WriteLine($"particle {index}");
 
       ActorId id = new ActorId(aggreator);
       var fc = new FabricClient();
@@ -45,7 +45,7 @@ namespace Particle
       var serviceUri = new Uri(FabricRuntime.GetActivationContext().ApplicationName + "/AggreatorActorService");
 
       IAggreator proxy = ActorProxy.Create<IAggreator>(id, serviceUri);
-      return proxy.Report(inside);
+      return proxy.Report(inside,index);
     }
 
     

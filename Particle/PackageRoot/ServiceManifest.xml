@@ -26,7 +26,7 @@
   <ConfigPackage Name="Config" Version="1.0.0" />
   <Resources>
     <Endpoints>
-      <Endpoint Name="ParticleActorServiceEndpoint" />
+      <Endpoint Name="ParticleActorServiceEndpoint" UriScheme="net:tcp" />
       <Endpoint Name="ParticleActorServiceReplicatorEndpoint" />
     </Endpoints>
   </Resources>

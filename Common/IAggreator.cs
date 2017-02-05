@@ -9,7 +9,7 @@ namespace Common
 {
   public interface IAggreator:IActor
   {
-    Task Report(bool status);
+    Task Report(bool status, long index);
     Task<Reslut> GetResult();
     Task Init(long count);
   }

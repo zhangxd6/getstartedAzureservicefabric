@@ -28,15 +28,15 @@ namespace Aggreator
 
     public async Task<Reslut> GetResult()
     {
-      var current = await this.StateManager.TryGetStateAsync<long>("count");
-      var process = await this.StateManager.TryGetStateAsync<long>("process");
-      var total = await this.StateManager.TryGetStateAsync<long>("total");
+      var current = await this.StateManager.GetStateAsync<long>("count");
+      var process = await this.StateManager.GetStateAsync<long>("process");
+      var total = await this.StateManager.GetStateAsync<long>("total");
       Reslut r = new Reslut
       {
-        Result = 4.0 * (current.Value) / (total.Value),
-        Status = process.Value == total.Value ? "Done" : "Processing",
-        Total = total.Value,
-        Processed = process.Value
+        Result = 4.0 * (current) / (process),
+        Status = process == total ? "Done" : "Processing",
+        Total = total,
+        Processed = process
       };
       return r;
     }
@@ -48,19 +48,17 @@ namespace Aggreator
       await this.StateManager.TryAddStateAsync<long>("total", count);
     }
 
-    public async Task Report(bool status)
+    public async Task Report(bool status,long index)
     {
-      var current = await this.StateManager.TryGetStateAsync<long>("count");
+      System.Diagnostics.Debug.WriteLine($"aggreator {index}");
+
+      var current = await this.StateManager.GetStateAsync<long>("count");
       if (status)
       {
-        long count = current.HasValue ? current.Value : 0;
-        count += 1;
-        await this.StateManager.SetStateAsync<long>("count", count);
+        await this.StateManager.SetStateAsync<long>("count", current+1);
       }
-      var process = await this.StateManager.TryGetStateAsync<long>("process");
-      long processCount = current.HasValue ? current.Value : 0;
-      processCount += 1;
-      await this.StateManager.SetStateAsync<long>("process", processCount);
+      var process = await this.StateManager.GetStateAsync<long>("process");
+      await this.StateManager.SetStateAsync<long>("process", process+1);
     }
 
 

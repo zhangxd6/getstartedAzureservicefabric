@@ -9,6 +9,6 @@ namespace Common
 {
   public interface IParticle:IActor
   {
-    Task DestermineLocation(double x, double y, Guid aggreator);
+    Task DestermineLocation(double x, double y, Guid aggreator,long index);
   }
 }

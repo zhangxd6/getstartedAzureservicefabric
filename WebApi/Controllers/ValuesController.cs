@@ -136,16 +136,27 @@ namespace WebApi.Controllers
         await aproxy.Init(number);
         var pUri = new Uri(FabricRuntime.GetActivationContext().ApplicationName + "/ParticleActorService");
         var rnd = new Random();
-         for (long i = 0; i < number; i++)
-        //Parallel.For(0, number, async (i) =>
-           {
-             ActorId pid = new ActorId(Guid.NewGuid());
-             var pproxy = ActorProxy.Create<IParticle>(pid, pUri);
-             var x = rnd.NextDouble() - 0.5;
-             var y = rnd.NextDouble() - 0.5;
-             await pproxy.DestermineLocation(x, y, id);
-             await Task.Delay(new TimeSpan(0, 0,0,0,300));
-           }
+        // for (long i = 0; i < number; i++)
+         Task.Run(() =>
+          {
+            Parallel.For(0, number, async (i) =>
+                {
+                  ActorId pid = new ActorId(Guid.NewGuid());
+                  var pproxy = ActorProxy.Create<IParticle>(pid, pUri);
+                  var x = rnd.NextDouble() - 0.5;
+                  var y = rnd.NextDouble() - 0.5;
+                  try
+                  {
+                    System.Diagnostics.Debug.WriteLine($"{i + 1} call ...");
+                    await pproxy.DestermineLocation(x, y, id, i + 1);
+
+                  }
+                  catch (Exception e)
+                  {
+
+                  }
+                });
+          });
         return Ok(id);
       }
       catch
